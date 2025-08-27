@@ -46,6 +46,37 @@ interface Settings {
   }
 }
 
+const roleConfig = {
+  super_admin: {
+    name: "Super Admin",
+    description: "Has all permissions. Can manage users and system settings.",
+  },
+  recruiter: {
+    name: "Recruiter",
+    description: "Can view and manage candidates, jobs, and applications.",
+  },
+  hiring_manager: {
+    name: "Hiring Manager",
+    description: "Can view candidates and jobs, and manage applications for their own jobs.",
+  },
+  candidate: {
+    name: "Candidate",
+    description: "Can view their own profile and applications.",
+  },
+  interviewer: {
+    name: "Interviewer",
+    description: "Can view candidate profiles for interviews they are assigned to.",
+  },
+  sourcing_specialist: {
+    name: "Sourcing Specialist",
+    description: "Can search for and add new candidates to the system.",
+  },
+  recruiting_coordinator: {
+    name: "Recruiting Coordinator",
+    description: "Can schedule interviews and manage interview logistics.",
+  },
+}
+
 export default function SettingsPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [settings, setSettings] = useState<Settings>({
@@ -316,11 +347,17 @@ export default function SettingsPage() {
               onChange={(e) => setProfile((prev) => (prev ? { ...prev, role: e.target.value } : null))}
               className="w-full bg-slate-700/50 border border-slate-600/50 text-white rounded-md px-3 py-2"
             >
-              <option value="recruiter">Recruiter</option>
-              <option value="hr_manager">HR Manager</option>
-              <option value="candidate">Candidate</option>
-              <option value="admin">Admin</option>
+              {Object.entries(roleConfig).map(([roleId, { name }]) => (
+                <option key={roleId} value={roleId}>
+                  {name}
+                </option>
+              ))}
             </select>
+            {profile?.role && (
+              <p className="text-sm text-slate-400">
+                {roleConfig[profile.role as keyof typeof roleConfig]?.description}
+              </p>
+            )}
           </div>
           <Button
             onClick={() =>
