@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
-import { User, Mail, Phone, MapPin, Briefcase, GraduationCap, Award, Code, Edit, Download, Share } from "lucide-react"
+import { User, Linkedin, Building2, Mail, Phone, MapPin, Briefcase, GraduationCap, Award, Code, Edit, Download, Share } from "lucide-react"
 import { toast } from "sonner"
 
 interface ParsedResume {
@@ -65,6 +65,37 @@ interface Profile {
   email: string
   role: string
   created_at: string
+  company?: string
+  department?: string
+  phone?: string
+  location?: string
+  linkedin_url?: string
+  website_url?: string
+  professional_summary?: string
+}
+
+const roleConfig = {
+  super_admin: {
+    name: "Super Admin",
+  },
+  recruiter: {
+    name: "Recruiter",
+  },
+  hiring_manager: {
+    name: "Hiring Manager",
+  },
+  candidate: {
+    name: "Candidate",
+  },
+  interviewer: {
+    name: "Interviewer",
+  },
+  sourcing_specialist: {
+    name: "Sourcing Specialist",
+  },
+  recruiting_coordinator: {
+    name: "Recruiting Coordinator",
+  },
 }
 
 export default function ProfilePage() {
@@ -135,7 +166,7 @@ export default function ProfilePage() {
     )
   }
 
-  if (!parsedResume) {
+  if (!profile && !parsedResume) {
     return (
       <div className="container mx-auto py-8">
         <Card>
@@ -154,7 +185,20 @@ export default function ProfilePage() {
     )
   }
 
-  const { personalInfo, summary, experience, education, skills, certifications, projects } = parsedResume.parsed_data
+  const displayProfile = {
+    fullName: profile?.full_name ?? parsedResume?.parsed_data.personalInfo.fullName,
+    email: profile?.email ?? parsedResume?.parsed_data.personalInfo.email,
+    phone: profile?.phone ?? parsedResume?.parsed_data.personalInfo.phone,
+    location: profile?.location ?? parsedResume?.parsed_data.personalInfo.location,
+    linkedIn: profile?.linkedin_url ?? parsedResume?.parsed_data.personalInfo.linkedIn,
+    website: profile?.website_url ?? parsedResume?.parsed_data.personalInfo.website,
+    professionalSummary: profile?.professional_summary ?? parsedResume?.parsed_data.summary,
+    role: profile?.role,
+    company: profile?.company,
+    department: profile?.department,
+  }
+
+  const { experience, education, skills, certifications, projects } = parsedResume?.parsed_data ?? {}
 
   return (
     <div className="container mx-auto py-8 space-y-8">
@@ -187,51 +231,71 @@ export default function ProfilePage() {
         <CardContent className="pt-6">
           <div className="flex items-start gap-6">
             <Avatar className="h-24 w-24">
-              <AvatarFallback className="text-2xl">{getInitials(personalInfo.fullName)}</AvatarFallback>
+              <AvatarFallback className="text-2xl">{getInitials(displayProfile.fullName)}</AvatarFallback>
             </Avatar>
             <div className="flex-1 space-y-4">
               <div>
-                <h2 className="text-2xl font-bold">{personalInfo.fullName}</h2>
-                {profile?.role && (
+                <h2 className="text-2xl font-bold">{displayProfile.fullName}</h2>
+                {displayProfile.role && (
                   <Badge variant="secondary" className="mt-1">
-                    {profile.role}
+                    {roleConfig[displayProfile.role as keyof typeof roleConfig]?.name ?? displayProfile.role}
                   </Badge>
                 )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                {personalInfo.email && (
+                {displayProfile.email && (
                   <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-muted-foreground" />
-                    <span>{personalInfo.email}</span>
+                    <span>{displayProfile.email}</span>
                   </div>
                 )}
-                {personalInfo.phone && (
+                {displayProfile.phone && (
                   <div className="flex items-center gap-2">
                     <Phone className="h-4 w-4 text-muted-foreground" />
-                    <span>{personalInfo.phone}</span>
+                    <span>{displayProfile.phone}</span>
                   </div>
                 )}
-                {personalInfo.location && (
+                {displayProfile.location && (
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span>{personalInfo.location}</span>
+                    <span>{displayProfile.location}</span>
                   </div>
                 )}
-                {personalInfo.linkedIn && (
+                {displayProfile.linkedIn && (
                   <div className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                    <a href={personalInfo.linkedIn} className="text-blue-600 hover:underline">
+                    <Linkedin className="h-4 w-4 text-muted-foreground" />
+                    <a href={displayProfile.linkedIn} className="text-blue-600 hover:underline">
                       LinkedIn Profile
                     </a>
                   </div>
                 )}
+                {displayProfile.website && (
+                  <div className="flex items-center gap-2">
+                    <Code className="h-4 w-4 text-muted-foreground" />
+                    <a href={displayProfile.website} className="text-blue-600 hover:underline">
+                      Website
+                    </a>
+                  </div>
+                )}
+                {displayProfile.company && (
+                  <div className="flex items-center gap-2">
+                    <Briefcase className="h-4 w-4 text-muted-foreground" />
+                    <span>{displayProfile.company}</span>
+                  </div>
+                )}
+                {displayProfile.department && (
+                  <div className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-muted-foreground" />
+                    <span>{displayProfile.department}</span>
+                  </div>
+                )}
               </div>
 
-              {summary && (
+              {displayProfile.professionalSummary && (
                 <div>
                   <h3 className="font-semibold mb-2">Professional Summary</h3>
-                  <p className="text-muted-foreground leading-relaxed">{summary}</p>
+                  <p className="text-muted-foreground leading-relaxed">{displayProfile.professionalSummary}</p>
                 </div>
               )}
             </div>

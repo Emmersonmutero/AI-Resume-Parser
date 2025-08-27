@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Briefcase, MapPin, Clock, Users, Search, Database, AlertCircle } from "lucide-react"
+import { usePermissions } from "@/hooks/use-permissions"
 import { toast } from "sonner"
 import Link from "next/link"
 
@@ -29,6 +30,7 @@ export default function JobsPage() {
   const [jobs, setJobs] = useState<JobDescription[]>([])
   const [loading, setLoading] = useState(true)
   const [needsSetup, setNeedsSetup] = useState(false)
+  const { permissions, loading: permissionsLoading } = usePermissions()
   const supabase = createBrowserClient()
 
   useEffect(() => {
@@ -160,12 +162,14 @@ export default function JobsPage() {
           <h1 className="text-3xl font-bold">Job Descriptions</h1>
           <p className="text-muted-foreground mt-2">Manage job postings and find matching candidates</p>
         </div>
-        <Button asChild>
-          <Link href="/dashboard/jobs/create">
-            <Plus className="mr-2 h-4 w-4" />
-            Create Job
-          </Link>
-        </Button>
+        {!permissionsLoading && permissions.includes("jobs:create") && (
+          <Button asChild>
+            <Link href="/dashboard/jobs/create">
+              <Plus className="mr-2 h-4 w-4" />
+              Create Job
+            </Link>
+          </Button>
+        )}
       </div>
 
       {/* Stats */}
@@ -224,12 +228,14 @@ export default function JobsPage() {
             <CardDescription>Create your first job description to start matching candidates</CardDescription>
           </CardHeader>
           <CardContent className="text-center">
-            <Button asChild>
-              <Link href="/dashboard/jobs/create">
-                <Plus className="mr-2 h-4 w-4" />
-                Create Job Description
-              </Link>
-            </Button>
+            {!permissionsLoading && permissions.includes("jobs:create") && (
+              <Button asChild>
+                <Link href="/dashboard/jobs/create">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Job Description
+                </Link>
+              </Button>
+            )}
           </CardContent>
         </Card>
       ) : (

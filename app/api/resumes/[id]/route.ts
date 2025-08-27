@@ -1,10 +1,11 @@
 import { del } from "@vercel/blob"
-import { createClient } from "@/lib/supabase/server"
+import { createServerClient } from "@/lib/supabase/server"
 import { type NextRequest, NextResponse } from "next/server"
+import { hasPermission } from "@/lib/permissions"
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const supabase = createClient()
+    const supabase = await createServerClient()
 
     // Check authentication
     const {
@@ -13,6 +14,11 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const canDeleteCandidates = await hasPermission(user.id, "candidates:delete")
+    if (!canDeleteCandidates) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
     const resumeId = params.id
