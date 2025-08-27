@@ -33,17 +33,33 @@ export async function updateSession(request: NextRequest) {
   // with the Supabase client, your users may be randomly logged out.
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser()
 
-  if (
-    request.nextUrl.pathname !== "/" &&
-    !user &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/auth")
-  ) {
+  // Handle authentication errors gracefully
+  if (error) {
+    console.error('Auth error in middleware:', error)
+    // Continue with no user if there's an auth error
+  }
+
+  // Check if user is trying to access protected routes
+  const isAuthRoute = request.nextUrl.pathname.startsWith("/auth") || 
+                      request.nextUrl.pathname.startsWith("/login")
+  const isHomePage = request.nextUrl.pathname === "/"
+  const isProtectedRoute = !isAuthRoute && !isHomePage
+
+  if (isProtectedRoute && !user) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone()
     url.pathname = "/auth/login"
+    return NextResponse.redirect(url)
+  }
+
+  // If user is authenticated and tries to access auth pages, redirect them
+  if (user && (request.nextUrl.pathname.startsWith("/auth") || 
+               request.nextUrl.pathname.startsWith("/login"))) {
+    const url = request.nextUrl.clone()
+    url.pathname = "/dashboard" // or your preferred authenticated landing page
     return NextResponse.redirect(url)
   }
 
