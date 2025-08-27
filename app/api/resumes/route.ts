@@ -1,9 +1,10 @@
-import { createClient } from "@/lib/supabase/server"
+import { createServerClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
+import { hasPermission } from "@/lib/permissions"
 
 export async function GET() {
   try {
-    const supabase = createClient()
+    const supabase = await createServerClient()
 
     // Check authentication
     const {
@@ -12,6 +13,11 @@ export async function GET() {
     } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const canReadCandidates = await hasPermission(user.id, "candidates:read")
+    if (!canReadCandidates) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
     // Get user's resumes
