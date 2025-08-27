@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { Upload, ChartLine, Lightbulb, Quote } from "lucide-react"
 
 export default function HomePage() {
   return (
@@ -137,6 +138,100 @@ export default function HomePage() {
               <p className="text-gray-600 leading-relaxed">
                 AI-powered matching scores and compatibility analysis to find the best candidates for your job openings
               </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* How it Works Section */}
+      <div id="how-it-works" className="bg-white py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              A simple three-step process to get started
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center p-8">
+              <div className="w-16 h-16 bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Upload className="w-8 h-8 text-gray-700" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">1. Upload Resume</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Simply upload your candidate's resume in any format (PDF, DOCX, TXT).
+              </p>
+            </div>
+
+            <div className="text-center p-8">
+              <div className="w-16 h-16 bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <ChartLine className="w-8 h-8 text-gray-700" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">2. AI Analysis</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Our AI will instantly parse and analyze the resume, extracting key information.
+              </p>
+            </div>
+
+            <div className="text-center p-8">
+              <div className="w-16 h-16 bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Lightbulb className="w-8 h-8 text-gray-700" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">3. Get Insights</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Receive structured data, candidate summaries, and job matching scores in seconds.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Testimonials Section */}
+      <div id="testimonials" className="bg-gray-50 py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">What Our Customers Say</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Real stories from companies who have transformed their hiring with ResumeAI
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-white p-8 rounded-2xl shadow-md">
+              <Quote className="w-8 h-8 text-blue-500 mb-4" />
+              <p className="text-gray-600 leading-relaxed mb-6">
+                "ResumeAI has been a game-changer for our recruitment process. The accuracy of the parsing is incredible,
+                and it has saved us countless hours of manual work."
+              </p>
+              <div>
+                <div className="font-bold text-gray-900">Sarah Johnson</div>
+                <div className="text-gray-500">HR Manager, TechCorp</div>
+              </div>
+            </div>
+
+            <div className="bg-white p-8 rounded-2xl shadow-md">
+              <Quote className="w-8 h-8 text-blue-500 mb-4" />
+              <p className="text-gray-600 leading-relaxed mb-6">
+                "The AI-powered candidate matching is simply brilliant. We've found more qualified candidates in the
+                last month than we did in the previous six."
+              </p>
+              <div>
+                <div className="font-bold text-gray-900">Michael Chen</div>
+                <div className="text-gray-500">Talent Acquisition Lead, Innovate Inc.</div>
+              </div>
+            </div>
+
+            <div className="bg-white p-8 rounded-2xl shadow-md">
+              <Quote className="w-8 h-8 text-blue-500 mb-4" />
+              <p className="text-gray-600 leading-relaxed mb-6">
+                "I was skeptical at first, but ResumeAI has exceeded all my expectations. It's fast, accurate, and
+                incredibly easy to use. I can't imagine going back to our old process."
+              </p>
+              <div>
+                <div className="font-bold text-gray-900">Emily Rodriguez</div>
+                <div className="text-gray-500">Recruiter, Global Solutions</div>
+              </div>
             </div>
           </div>
         </div>
