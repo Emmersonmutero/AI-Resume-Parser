@@ -1,9 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createServerClient } from "@/lib/supabase/server"
+import { hasPermission } from "@/lib/permissions"
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient()
+    const supabase = await createServerClient()
 
     // Get current user
     const {
@@ -12,6 +13,11 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const canReadInterviews = await hasPermission(user.id, "interviews:read")
+    if (!canReadInterviews) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
     // Fetch interviews with related data
@@ -79,7 +85,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
+    const supabase = await createServerClient()
 
     // Get current user
     const {
@@ -88,6 +94,11 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const canCreateInterviews = await hasPermission(user.id, "interviews:create")
+    if (!canCreateInterviews) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
     const body = await request.json()

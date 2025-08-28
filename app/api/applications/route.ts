@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@/lib/supabase/server"
+import { hasPermission } from "@/lib/permissions"
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,6 +11,11 @@ export async function GET(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const canReadApplications = await hasPermission(user.id, "applications:read")
+    if (!canReadApplications) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
     // Try to fetch applications, handle missing table gracefully
@@ -56,6 +62,11 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const canCreateApplications = await hasPermission(user.id, "applications:create")
+    if (!canCreateApplications) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
     const { jobId, resumeId, coverLetter } = await request.json()

@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
 import { User, Bell, Shield, Database, Download, Trash2 } from "lucide-react"
@@ -17,6 +18,13 @@ interface UserProfile {
   email: string
   role: string
   created_at: string
+  company?: string
+  department?: string
+  phone?: string
+  location?: string
+  linkedin_url?: string
+  website_url?: string
+  professional_summary?: string
 }
 
 interface Settings {
@@ -36,6 +44,37 @@ interface Settings {
     language: string
     timezone: string
   }
+}
+
+const roleConfig = {
+  super_admin: {
+    name: "Super Admin",
+    description: "Has all permissions. Can manage users and system settings.",
+  },
+  recruiter: {
+    name: "Recruiter",
+    description: "Can view and manage candidates, jobs, and applications.",
+  },
+  hiring_manager: {
+    name: "Hiring Manager",
+    description: "Can view candidates and jobs, and manage applications for their own jobs.",
+  },
+  candidate: {
+    name: "Candidate",
+    description: "Can view their own profile and applications.",
+  },
+  interviewer: {
+    name: "Interviewer",
+    description: "Can view candidate profiles for interviews they are assigned to.",
+  },
+  sourcing_specialist: {
+    name: "Sourcing Specialist",
+    description: "Can search for and add new candidates to the system.",
+  },
+  recruiting_coordinator: {
+    name: "Recruiting Coordinator",
+    description: "Can schedule interviews and manage interview logistics.",
+  },
 }
 
 export default function SettingsPage() {
@@ -217,6 +256,86 @@ export default function SettingsPage() {
                 className="bg-slate-700/50 border-slate-600/50 text-white"
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="text-white">
+                Phone
+              </Label>
+              <Input
+                id="phone"
+                value={profile?.phone || ""}
+                onChange={(e) => setProfile((prev) => (prev ? { ...prev, phone: e.target.value } : null))}
+                className="bg-slate-700/50 border-slate-600/50 text-white"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="location" className="text-white">
+                Location
+              </Label>
+              <Input
+                id="location"
+                value={profile?.location || ""}
+                onChange={(e) => setProfile((prev) => (prev ? { ...prev, location: e.target.value } : null))}
+                className="bg-slate-700/50 border-slate-600/50 text-white"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="company" className="text-white">
+                Company
+              </Label>
+              <Input
+                id="company"
+                value={profile?.company || ""}
+                onChange={(e) => setProfile((prev) => (prev ? { ...prev, company: e.target.value } : null))}
+                className="bg-slate-700/50 border-slate-600/50 text-white"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="department" className="text-white">
+                Department
+              </Label>
+              <Input
+                id="department"
+                value={profile?.department || ""}
+                onChange={(e) => setProfile((prev) => (prev ? { ...prev, department: e.target.value } : null))}
+                className="bg-slate-700/50 border-slate-600/50 text-white"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="linkedin_url" className="text-white">
+                LinkedIn URL
+              </Label>
+              <Input
+                id="linkedin_url"
+                value={profile?.linkedin_url || ""}
+                onChange={(e) => setProfile((prev) => (prev ? { ...prev, linkedin_url: e.target.value } : null))}
+                className="bg-slate-700/50 border-slate-600/50 text-white"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="website_url" className="text-white">
+                Website URL
+              </Label>
+              <Input
+                id="website_url"
+                value={profile?.website_url || ""}
+                onChange={(e) => setProfile((prev) => (prev ? { ...prev, website_url: e.target.value } : null))}
+                className="bg-slate-700/50 border-slate-600/50 text-white"
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="professional_summary" className="text-white">
+              Professional Summary
+            </Label>
+            <Textarea
+              id="professional_summary"
+              value={profile?.professional_summary || ""}
+              onChange={(e) =>
+                setProfile((prev) => (prev ? { ...prev, professional_summary: e.target.value } : null))
+              }
+              className="bg-slate-700/50 border-slate-600/50 text-white"
+              rows={5}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="role" className="text-white">
@@ -228,11 +347,17 @@ export default function SettingsPage() {
               onChange={(e) => setProfile((prev) => (prev ? { ...prev, role: e.target.value } : null))}
               className="w-full bg-slate-700/50 border border-slate-600/50 text-white rounded-md px-3 py-2"
             >
-              <option value="recruiter">Recruiter</option>
-              <option value="hr_manager">HR Manager</option>
-              <option value="candidate">Candidate</option>
-              <option value="admin">Admin</option>
+              {Object.entries(roleConfig).map(([roleId, { name }]) => (
+                <option key={roleId} value={roleId}>
+                  {name}
+                </option>
+              ))}
             </select>
+            {profile?.role && (
+              <p className="text-sm text-slate-400">
+                {roleConfig[profile.role as keyof typeof roleConfig]?.description}
+              </p>
+            )}
           </div>
           <Button
             onClick={() =>
@@ -241,6 +366,13 @@ export default function SettingsPage() {
                 full_name: profile.full_name,
                 email: profile.email,
                 role: profile.role,
+                company: profile.company,
+                department: profile.department,
+                phone: profile.phone,
+                location: profile.location,
+                linkedin_url: profile.linkedin_url,
+                website_url: profile.website_url,
+                professional_summary: profile.professional_summary,
               })
             }
             className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"

@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@/lib/supabase/server"
 import { generateText } from "ai"
+import { hasPermission } from "@/lib/permissions"
 import { groq } from "@ai-sdk/groq"
 
 export async function POST(request: NextRequest) {
@@ -12,6 +13,11 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const canReadCandidates = await hasPermission(user.id, "candidates:read")
+    if (!canReadCandidates) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
     const { type, content, jobDescription, company, position } = await request.json()

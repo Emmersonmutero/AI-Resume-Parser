@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@/lib/supabase/server"
 import { parseResumeText, extractTextFromFile } from "@/lib/resume-parser"
+import { hasPermission } from "@/lib/permissions"
 import { get } from "@vercel/blob"
 
 export async function POST(request: NextRequest) {
@@ -14,6 +15,11 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const canCreateCandidates = await hasPermission(user.id, "candidates:create")
+    if (!canCreateCandidates) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
     const { resumeId } = await request.json()

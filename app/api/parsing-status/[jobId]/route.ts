@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@/lib/supabase/server"
+import { hasPermission } from "@/lib/permissions"
 
 export async function GET(request: NextRequest, { params }: { params: { jobId: string } }) {
   try {
@@ -12,6 +13,11 @@ export async function GET(request: NextRequest, { params }: { params: { jobId: s
     } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const canReadCandidates = await hasPermission(user.id, "candidates:read")
+    if (!canReadCandidates) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
     const { data: job, error } = await supabase
