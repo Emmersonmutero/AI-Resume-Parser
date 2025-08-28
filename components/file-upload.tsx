@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { useDropzone } from "react-dropzone"
+import { usePermissions } from "@/hooks/use-permissions"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
@@ -25,6 +26,7 @@ export function FileUpload({ onUploadComplete }: FileUploadProps) {
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
   const [error, setError] = useState<string | null>(null)
+  const { permissions, loading: permissionsLoading } = usePermissions()
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
@@ -74,6 +76,8 @@ export function FileUpload({ onUploadComplete }: FileUploadProps) {
     [onUploadComplete],
   )
 
+  const canCreateCandidates = !permissionsLoading && permissions.includes("candidates:create")
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
@@ -83,7 +87,7 @@ export function FileUpload({ onUploadComplete }: FileUploadProps) {
     },
     maxFiles: 1,
     maxSize: 10 * 1024 * 1024, // 10MB
-    disabled: uploading,
+    disabled: uploading || !canCreateCandidates,
   })
 
   const removeFile = async (fileId: string) => {
@@ -130,13 +134,18 @@ export function FileUpload({ onUploadComplete }: FileUploadProps) {
                 <Progress value={uploadProgress} className="w-full max-w-xs mx-auto" />
                 <p className="text-sm text-gray-500">{uploadProgress}% complete</p>
               </div>
-            ) : (
+            ) : canCreateCandidates ? (
               <div>
                 <p className="text-lg font-medium text-gray-700 mb-2">
                   {isDragActive ? "Drop your resume here" : "Upload your resume"}
                 </p>
                 <p className="text-sm text-gray-500 mb-4">Drag and drop or click to select files</p>
                 <p className="text-xs text-gray-400">Supports PDF, DOCX, and TXT files up to 10MB</p>
+              </div>
+            ) : (
+              <div>
+                <p className="text-lg font-medium text-gray-700 mb-2">Permission Denied</p>
+                <p className="text-sm text-gray-500">You do not have permission to upload files.</p>
               </div>
             )}
           </div>

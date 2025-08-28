@@ -1,10 +1,11 @@
 import { put } from "@vercel/blob"
-import { createClient } from "@/lib/supabase/server"
+import { createServerClient } from "@/lib/supabase/server"
 import { type NextRequest, NextResponse } from "next/server"
+import { hasPermission } from "@/lib/permissions"
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
+    const supabase = await createServerClient()
 
     // Check authentication
     const {
@@ -13,6 +14,11 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const canCreateCandidates = await hasPermission(user.id, "candidates:create")
+    if (!canCreateCandidates) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
     const formData = await request.formData()

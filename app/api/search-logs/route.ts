@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@/lib/supabase/server"
+import { hasPermission } from "@/lib/permissions"
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,6 +13,11 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const canReadUsers = await hasPermission(user.id, "users:read")
+    if (!canReadUsers) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
     const { query, filters, timestamp } = await request.json()
@@ -47,6 +53,11 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const canReadUsers = await hasPermission(user.id, "users:read")
+    if (!canReadUsers) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
     // Get search analytics

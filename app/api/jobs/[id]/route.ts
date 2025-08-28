@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@/lib/supabase/server"
+import { hasPermission } from "@/lib/permissions"
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -12,6 +13,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const canReadJobs = await hasPermission(user.id, "jobs:read")
+    if (!canReadJobs) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
     // Get job with match results
@@ -62,6 +68,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    const canUpdateJobs = await hasPermission(user.id, "jobs:update")
+    if (!canUpdateJobs) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
+
     const jobData = await request.json()
 
     // Update job description
@@ -108,6 +119,11 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const canDeleteJobs = await hasPermission(user.id, "jobs:delete")
+    if (!canDeleteJobs) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
     // Delete job and related matches
